@@ -2,12 +2,12 @@ from flask import session, render_template, request, redirect, url_for, flash, a
 from flask_login import current_user
 from sqlalchemy import or_, desc, func
 from app import app, db
-from replit_auth import require_login, make_replit_blueprint
+from auth import require_login, auth_bp
 from models import User, Question, Answer, Tag, Vote, question_tags
 from forms import QuestionForm, AnswerForm, SearchForm, ProfileForm
 from utils import process_tags, increment_question_views, get_popular_tags, format_relative_time
 
-app.register_blueprint(make_replit_blueprint(), url_prefix="/auth")
+app.register_blueprint(auth_bp)
 
 # Make session permanent
 @app.before_request
@@ -23,7 +23,7 @@ def relative_time(dt):
 def index():
     """Home page - shows recent questions."""
     if not current_user.is_authenticated:
-        return render_template('login.html')
+        return render_template('landing.html')
     
     page = request.args.get('page', 1, type=int)
     per_page = 10

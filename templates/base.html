@@ -16,10 +16,10 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); box-shadow: var(--box-shadow-lg);">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
-                <i class="fas fa-stack-overflow me-2"></i>StackIt
+                <i class="fas fa-layer-group me-2"></i>StackIt
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -48,7 +48,7 @@
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" href="{{ url_for('ask_question') }}">
+                            <a class="btn me-2" href="{{ url_for('ask_question') }}" style="background: var(--accent-color); border: none; color: white; border-radius: 25px; padding: 0.5rem 1rem;">
                                 <i class="fas fa-plus me-1"></i>Ask Question
                             </a>
                         </li>
@@ -71,15 +71,20 @@
                                     <i class="fas fa-cog me-2"></i>Settings
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('replit_auth.logout') }}">
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
+                        <li class="nav-item me-2">
+                            <a class="btn btn-outline-light" href="{{ url_for('auth.login') }}" style="border-radius: 25px;">
+                                <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                            </a>
+                        </li>
                         <li class="nav-item">
-                            <a class="btn btn-outline-light" href="{{ url_for('replit_auth.login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            <a class="btn" href="{{ url_for('auth.register') }}" style="background: var(--secondary-color); border: none; color: white; border-radius: 25px;">
+                                <i class="fas fa-user-plus me-1"></i>Sign Up
                             </a>
                         </li>
                     {% endif %}

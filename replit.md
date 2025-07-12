@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 - **Templates**: Jinja2 templating engine
 - **CSS Framework**: Bootstrap 5.3.0 for responsive design
+- **Color Scheme**: Modern gradient palette with purple primary (#6366f1), pink secondary (#ec4899), and green accent (#10b981) colors
 - **JavaScript**: Vanilla JavaScript with modern ES6+ features
 - **Rich Text**: TinyMCE integration for content editing
 - **Icons**: Font Awesome 6.4.0
@@ -35,10 +36,12 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Authentication System
-- Replit Auth integration for secure OAuth2 authentication
-- User session storage with browser session tracking
+- Traditional email/password authentication system
+- User registration with username, email, and optional profile information
+- Secure password hashing using Werkzeug
+- Flask-Login session management
 - Profile management with customizable user information
-- Mandatory OAuth and User tables for Replit compatibility
+- User model with username, email, first_name, last_name, and bio fields
 
 ### Content Management
 - Question creation with rich text editor support
