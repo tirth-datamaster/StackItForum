@@ -1,4 +1,5 @@
-<img width="2559" height="1390" alt="image" src="https://github.com/user-attachments/assets/f6bf7bae-f753-418c-856c-6ed86f7656be" /># StackIt – A Minimal Q&A Forum Platform
+
+<img width="2559" height="1397" alt="Screenshot 2025-07-12 150300" src="https://github.com/user-attachments/assets/ef04d8c0-ffb8-4872-be81-aac329a74162" />
 
 
 StackIt is a lightweight Question and Answer (Q&A) forum web application built using Python and Flask. Inspired by platforms like Stack Overflow, StackIt enables users to post questions, answer others, and engage in technical discussions in a simplified, clean interface.
