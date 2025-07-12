@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Bounties - StackIt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6">
+                    <i class="fas fa-trophy text-warning me-3"></i>
+                    Knowledge Bounties
+                </h1>
+                <div class="text-muted">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Offer reputation points for expert answers
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Bounty Stats Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-coins me-2"></i>
+                        Active Bounties
+                    </h5>
+                    <h2 class="display-4">{{ bounties|length }}</h2>
+                    <p class="card-text">Questions with reputation rewards</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works Card -->
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        How Bounties Work
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge bg-primary rounded-pill me-3">1</span>
+                                <span>Ask a challenging question</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge bg-primary rounded-pill me-3">2</span>
+                                <span>Add a bounty with reputation points</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge bg-primary rounded-pill me-3">3</span>
+                                <span>Get high-quality expert answers</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge bg-primary rounded-pill me-3">4</span>
+                                <span>Award bounty to the best answer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Bounties List -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Active Bounties</h3>
+            
+            {% if bounties %}
+                {% for bounty in bounties %}
+                <div class="card mb-4 bounty-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="bounty-amount">
+                                    <span class="display-6 text-warning">{{ bounty.bounty_amount }}</span>
+                                    <small class="text-muted d-block">reputation</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="mb-2">
+                                    <a href="{{ url_for('question_detail', id=bounty.question.id) }}" 
+                                       class="text-decoration-none">
+                                        {{ bounty.question.title }}
+                                    </a>
+                                </h5>
+                                <p class="text-muted mb-2">{{ bounty.description }}</p>
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ bounty.creator.display_name }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ relative_time(bounty.created_at) }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-hourglass-half me-1"></i>
+                                        Expires {{ relative_time(bounty.expires_at) }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <a href="{{ url_for('question_detail', id=bounty.question.id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-1"></i>
+                                    Answer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No active bounties</h4>
+                    <p class="text-muted">Be the first to offer a bounty for a challenging question!</p>
+                    <a href="{{ url_for('ask_question') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Ask a Question
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.bounty-card {
+    border-left: 4px solid var(--warning-color);
+    transition: var(--transition);
+}
+
+.bounty-card:hover {
+    box-shadow: var(--box-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.bounty-amount {
+    background: linear-gradient(135deg, var(--warning-color), #f39c12);
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 0.5rem;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+</style>
+{% endblock %}

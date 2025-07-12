@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Live Q&A Sessions - StackIt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6">
+                    <i class="fas fa-video text-danger me-3"></i>
+                    Live Q&A Sessions
+                </h1>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('features.create_live_session') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Host a Session
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Sessions -->
+    {% if active_sessions %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-broadcast-tower text-success me-2"></i>
+                Live Now
+            </h3>
+            {% for session in active_sessions %}
+            <div class="card mb-3 live-session-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-1 text-center">
+                            <div class="live-indicator">
+                                <i class="fas fa-circle text-danger"></i>
+                                <small class="text-muted d-block">LIVE</small>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h5 class="mb-2">{{ session.title }}</h5>
+                            <p class="text-muted mb-2">{{ session.description }}</p>
+                            <div class="d-flex align-items-center gap-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    {{ session.host.display_name }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ session.participants|length }}/{{ session.max_participants }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a href="{{ url_for('features.join_live_session', session_id=session.id) }}" 
+                               class="btn btn-success">
+                                <i class="fas fa-play me-1"></i>
+                                Join Session
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Upcoming Sessions -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                Upcoming Sessions
+            </h3>
+            
+            {% if upcoming_sessions %}
+                {% for session in upcoming_sessions %}
+                <div class="card mb-4 session-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="session-time">
+                                    <div class="date">{{ session.scheduled_at.strftime('%b %d') }}</div>
+                                    <div class="time">{{ session.scheduled_at.strftime('%I:%M %p') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="mb-2">{{ session.title }}</h5>
+                                <p class="text-muted mb-2">{{ session.description }}</p>
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ session.host.display_name }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ session.duration_minutes }} minutes
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>
+                                        Max {{ session.max_participants }} participants
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-outline-primary" 
+                                        onclick="addToCalendar('{{ session.title }}', '{{ session.scheduled_at.isoformat() }}', '{{ session.duration_minutes }}')">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Add to Calendar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No upcoming sessions</h4>
+                    <p class="text-muted">Be the first to host a live Q&A session!</p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('features.create_live_session') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Host a Session
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.live-session-card {
+    border-left: 4px solid var(--success-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.session-card {
+    border-left: 4px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+.session-card:hover {
+    box-shadow: var(--box-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.session-time {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.session-time .date {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.session-time .time {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.live-indicator {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+</style>
+
+<script>
+function addToCalendar(title, datetime, duration) {
+    const startDate = new Date(datetime);
+    const endDate = new Date(startDate.getTime() + duration * 60000);
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}/${endDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}&details=${encodeURIComponent('Live Q&A Session on StackIt')}`;
+    
+    window.open(googleCalendarUrl, '_blank');
+}
+</script>
+{% endblock %}

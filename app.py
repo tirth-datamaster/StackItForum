@@ -34,3 +34,11 @@ with app.app_context():
     import models  # noqa: F401
     db.create_all()
     logging.info("Database tables created")
+    
+    # Initialize achievements system
+    try:
+        from features import init_achievements
+        init_achievements()
+        logging.info("Achievements initialized")
+    except Exception as e:
+        logging.error(f"Failed to initialize achievements: {e}")

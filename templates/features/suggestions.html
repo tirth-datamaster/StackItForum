@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}AI Question Suggestions - StackIt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-6 mb-4">
+                <i class="fas fa-lightbulb text-warning me-3"></i>
+                AI-Powered Question Suggestions
+            </h1>
+            <p class="lead mb-4">Smart suggestions based on your activity and trending topics</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if suggestions %}
+                {% for suggestion in suggestions %}
+                <div class="card mb-4 suggestion-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-1 text-center">
+                                <div class="confidence-meter">
+                                    <div class="circular-progress" data-percentage="{{ (suggestion.confidence * 100)|int }}">
+                                        <span class="percentage">{{ (suggestion.confidence * 100)|int }}%</span>
+                                    </div>
+                                    <small class="text-muted">confidence</small>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="mb-2">{{ suggestion.title }}</h5>
+                                <p class="text-muted mb-3">{{ suggestion.content }}</p>
+                                <div class="suggested-tags mb-3">
+                                    {% for tag in suggestion.tags.split(',') %}
+                                        <span class="badge bg-primary me-1">{{ tag.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-robot me-1"></i>
+                                        AI Generated
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-brain me-1"></i>
+                                        Personalized for you
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-success mb-2" onclick="usesuggestion('{{ suggestion.title }}', '{{ suggestion.content }}', '{{ suggestion.tags }}')">
+                                    <i class="fas fa-check me-1"></i>
+                                    Use This
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="dismissSuggestion(this)">
+                                    <i class="fas fa-times me-1"></i>
+                                    Dismiss
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-brain fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No suggestions available</h4>
+                    <p class="text-muted">Ask more questions to get personalized AI suggestions!</p>
+                    <a href="{{ url_for('ask_question') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Ask a Question
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.suggestion-card {
+    border-left: 4px solid var(--warning-color);
+    transition: var(--transition);
+}
+
+.suggestion-card:hover {
+    box-shadow: var(--box-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.confidence-meter {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.circular-progress {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(var(--success-color) 0deg, var(--success-color) var(--percentage), #e5e7eb var(--percentage));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.circular-progress::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+}
+
+.percentage {
+    position: relative;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--success-color);
+}
+</style>
+
+<script>
+function usesuggestion(title, content, tags) {
+    // Redirect to ask question page with pre-filled data
+    const params = new URLSearchParams({
+        title: title,
+        content: content,
+        tags: tags
+    });
+    window.location.href = `/ask?${params.toString()}`;
+}
+
+function dismissSuggestion(button) {
+    const card = button.closest('.suggestion-card');
+    card.style.opacity = '0.5';
+    card.style.pointerEvents = 'none';
+    button.innerHTML = '<i class="fas fa-check me-1"></i> Dismissed';
+    button.disabled = true;
+}
+
+// Initialize circular progress bars
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.circular-progress');
+    progressBars.forEach(bar => {
+        const percentage = bar.dataset.percentage;
+        const degree = (percentage / 100) * 360;
+        bar.style.setProperty('--percentage', degree + 'deg');
+    });
+});
+</script>
+{% endblock %}

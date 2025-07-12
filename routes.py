@@ -6,8 +6,10 @@ from auth import require_login, auth_bp
 from models import User, Question, Answer, Tag, Vote, question_tags
 from forms import QuestionForm, AnswerForm, SearchForm, ProfileForm
 from utils import process_tags, increment_question_views, get_popular_tags, format_relative_time
+from features import features_bp
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(features_bp)
 
 # Make session permanent
 @app.before_request

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Trending Topics - StackIt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-6 mb-4">
+                <i class="fas fa-fire text-danger me-3"></i>
+                Trending Topics
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if trending %}
+                {% for topic in trending %}
+                <div class="card mb-4 trending-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="trending-score">
+                                    <span class="display-6 text-danger">{{ "%.1f"|format(topic.trend_score) }}</span>
+                                    <small class="text-muted d-block">trend score</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="mb-2">{{ topic.topic_name }}</h5>
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-question-circle me-1"></i>
+                                        {{ topic.question_count }} questions
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        {{ "%.1f"|format(topic.growth_rate * 100) }}% growth
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ relative_time(topic.tracked_at) }}
+                                    </small>
+                                </div>
+                                {% if topic.related_tags %}
+                                <div class="mt-2">
+                                    {% for tag in topic.related_tags %}
+                                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <a href="{{ url_for('search', q=topic.topic_name) }}" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i>
+                                    Explore
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No trending topics yet</h4>
+                    <p class="text-muted">Check back later for trending discussions!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.trending-card {
+    border-left: 4px solid var(--danger-color);
+    transition: var(--transition);
+}
+
+.trending-card:hover {
+    box-shadow: var(--box-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.trending-score {
+    background: linear-gradient(135deg, var(--danger-color), #dc3545);
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}

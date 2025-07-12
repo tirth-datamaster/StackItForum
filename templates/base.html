@@ -34,6 +34,40 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('tags_list') }}">Tags</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-star me-1"></i>Features
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('features.bounties') }}">
+                                <i class="fas fa-trophy me-2"></i>Bounties
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.live_sessions') }}">
+                                <i class="fas fa-video me-2"></i>Live Sessions
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.achievements') }}">
+                                <i class="fas fa-medal me-2"></i>Achievements
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.leaderboard') }}">
+                                <i class="fas fa-chart-line me-2"></i>Leaderboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.trending_topics') }}">
+                                <i class="fas fa-fire me-2"></i>Trending
+                            </a></li>
+                            {% if current_user.is_authenticated %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.mentorship') }}">
+                                <i class="fas fa-chalkboard-teacher me-2"></i>Mentorship
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.question_suggestions') }}">
+                                <i class="fas fa-lightbulb me-2"></i>AI Suggestions
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('features.analytics') }}">
+                                <i class="fas fa-chart-bar me-2"></i>Analytics
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                 </ul>
                 
                 <!-- Search Form -->

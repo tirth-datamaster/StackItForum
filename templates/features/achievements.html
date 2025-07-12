@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Achievements - StackIt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-6 mb-4">
+                <i class="fas fa-medal text-warning me-3"></i>
+                Achievements & Badges
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for achievement in achievements %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card achievement-card {% if achievement.id in user_achievements %}earned{% endif %}">
+                <div class="card-body text-center">
+                    <div class="achievement-icon mb-3">
+                        <i class="{{ achievement.icon }} fa-3x {% if achievement.id in user_achievements %}text-warning{% else %}text-muted{% endif %}"></i>
+                    </div>
+                    <h5 class="card-title">{{ achievement.name }}</h5>
+                    <p class="card-text text-muted">{{ achievement.description }}</p>
+                    <div class="achievement-points">
+                        <span class="badge bg-primary">{{ achievement.points }} points</span>
+                        <span class="badge bg-secondary">{{ achievement.category }}</span>
+                    </div>
+                    {% if achievement.id in user_achievements %}
+                    <div class="mt-3">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>
+                            Earned
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.achievement-card {
+    transition: var(--transition);
+    border: 2px solid #e5e7eb;
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-lg);
+}
+
+.achievement-card.earned {
+    border-color: var(--warning-color);
+    background: linear-gradient(135deg, #fff9db, #ffffff);
+}
+
+.achievement-icon {
+    padding: 1rem;
+    border-radius: 50%;
+    background: #f8f9fa;
+}
+
+.achievement-card.earned .achievement-icon {
+    background: linear-gradient(135deg, var(--warning-color), #f39c12);
+    color: white;
+}
+</style>
+{% endblock %}
