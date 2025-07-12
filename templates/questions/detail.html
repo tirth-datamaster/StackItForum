@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title }} - StackIt{% endblock %}
+
+{% block breadcrumbs %}
+<div class="bg-light py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('questions_list') }}">Questions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ question.title|truncate(50) }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Question -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="h3 mb-0">{{ question.title }}</h1>
+                        {% if current_user.is_authenticated and current_user.id == question.author_id %}
+                            <a href="{{ url_for('edit_question', id=question.id) }}" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Question Meta -->
+                    <div class="question-meta mb-3">
+                        <span class="text-muted small">
+                            <i class="fas fa-clock me-1"></i>Asked {{ relative_time(question.created_at) }}
+                            {% if question.updated_at != question.created_at %}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-edit me-1"></i>Modified {{ relative_time(question.updated_at) }}
+                            {% endif %}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-eye me-1"></i>Viewed {{ question.views }} time{{ 's' if question.views != 1 else '' }}
+                        </span>
+                    </div>
+                    
+                    <!-- Question Content -->
+                    <div class="question-content mb-3">
+                        {{ question.content|safe }}
+                    </div>
+                    
+                    <!-- Tags -->
+                    {% if question.tags %}
+                        <div class="mb-3">
+                            {% for tag in question.tags %}
+                                <a href="{{ url_for('questions_list', tag=tag.name) }}" 
+                                   class="badge bg-secondary text-decoration-none me-1">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Author Info -->
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="author-card bg-light p-3 rounded">
+                                <div class="d-flex align-items-center">
+                                    {% if question.author.profile_image_url %}
+                                        <img src="{{ question.author.profile_image_url }}" alt="Profile" 
+                                             class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">
+                                            <a href="{{ url_for('user_profile', user_id=question.author.id) }}" 
+                                               class="text-decoration-none">{{ question.author.display_name }}</a>
+                                        </h6>
+                                        <small class="text-muted">{{ question.author.reputation }} reputation</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answers Section -->
+            <div class="answers-section">
+                <h4 class="mb-3">
+                    {{ answers|length }} Answer{{ 's' if answers|length != 1 else '' }}
+                </h4>
+                
+                {% for answer in answers %}
+                    <div class="card mb-3 answer-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Vote Section -->
+                                <div class="col-md-1 text-center">
+                                    {% if current_user.is_authenticated %}
+                                        <form method="POST" action="{{ url_for('vote') }}" class="vote-form">
+                                            <input type="hidden" name="answer_id" value="{{ answer.id }}">
+                                            <button type="submit" name="vote_type" value="up" 
+                                                    class="btn btn-sm {{ 'btn-success' if user_votes.get(answer.id) == True else 'btn-outline-secondary' }} mb-1 vote-btn">
+                                                <i class="fas fa-chevron-up"></i>
+                                            </button>
+                                        </form>
+                                        <div class="vote-score fw-bold text-center">{{ answer.vote_score }}</div>
+                                        <form method="POST" action="{{ url_for('vote') }}" class="vote-form">
+                                            <input type="hidden" name="answer_id" value="{{ answer.id }}">
+                                            <button type="submit" name="vote_type" value="down" 
+                                                    class="btn btn-sm {{ 'btn-danger' if user_votes.get(answer.id) == False else 'btn-outline-secondary' }} mt-1 vote-btn">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <div class="btn btn-sm btn-outline-secondary mb-1">
+                                            <i class="fas fa-chevron-up"></i>
+                                        </div>
+                                        <div class="vote-score fw-bold text-center">{{ answer.vote_score }}</div>
+                                        <div class="btn btn-sm btn-outline-secondary mt-1">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Answer Content -->
+                                <div class="col-md-11">
+                                    <div class="answer-content mb-3">
+                                        {{ answer.content|safe }}
+                                    </div>
+                                    
+                                    <!-- Answer Actions -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {% if current_user.is_authenticated and current_user.id == answer.author_id %}
+                                                <a href="{{ url_for('edit_answer', id=answer.id) }}" 
+                                                   class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Answer Author -->
+                                        <div class="author-info">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="d-flex align-items-center">
+                                                    {% if answer.author.profile_image_url %}
+                                                        <img src="{{ answer.author.profile_image_url }}" alt="Profile" 
+                                                             class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                                                    {% else %}
+                                                        <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                                                             style="width: 32px; height: 32px;">
+                                                            <i class="fas fa-user text-white small"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        <h6 class="mb-0 small">
+                                                            <a href="{{ url_for('user_profile', user_id=answer.author.id) }}" 
+                                                               class="text-decoration-none">{{ answer.author.display_name }}</a>
+                                                        </h6>
+                                                        <small class="text-muted">{{ relative_time(answer.created_at) }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Answer Form -->
+            {% if current_user.is_authenticated %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Answer</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('post_answer', question_id=question.id) }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.content.label(class="form-label") }}
+                                {{ form.content(class="form-control tinymce-editor", rows="8") }}
+                                {% if form.content.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.content.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-reply me-1"></i>Post Your Answer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card mt-4">
+                    <div class="card-body text-center">
+                        <h6>Want to answer this question?</h6>
+                        <p class="text-muted">You need to be logged in to post an answer.</p>
+                        <a href="{{ url_for('replit_auth.login') }}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login to Answer
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Question Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-1"></i>Question Stats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Views:</span>
+                        <strong>{{ question.views }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Answers:</span>
+                        <strong>{{ answers|length }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Asked:</span>
+                        <strong>{{ relative_time(question.created_at) }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Questions -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-link me-1"></i>Related Questions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Coming soon...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize TinyMCE for answer form
+    tinymce.init({
+        selector: '.tinymce-editor',
+        height: 300,
+        menubar: false,
+        plugins: 'lists link code',
+        toolbar: 'bold italic | bullist numlist | link code | removeformat',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }'
+    });
+</script>
+{% endblock %}

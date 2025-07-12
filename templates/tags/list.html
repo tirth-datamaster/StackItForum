@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Tags - StackIt{% endblock %}
+
+{% block breadcrumbs %}
+<div class="bg-light py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tags</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">All Tags</h2>
+                    <p class="text-muted mb-0">Browse questions by topic</p>
+                </div>
+            </div>
+
+            <!-- Search Tags -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('search') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="tag" 
+                                   placeholder="Search tags..." 
+                                   value="{{ request.args.get('tag', '') }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tags Grid -->
+            {% if tags %}
+                <div class="row">
+                    {% for tag in tags %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 tag-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">
+                                            <a href="{{ url_for('questions_list', tag=tag.name) }}" 
+                                               class="text-decoration-none">
+                                                <span class="badge fs-6" style="background-color: {{ tag.color }};">
+                                                    {{ tag.name }}
+                                                </span>
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted">{{ tag.question_count }} question{{ 's' if tag.question_count != 1 else '' }}</small>
+                                    </div>
+                                    
+                                    {% if tag.description %}
+                                        <p class="card-text small text-muted">{{ tag.description|truncate(100) }}</p>
+                                    {% else %}
+                                        <p class="card-text small text-muted">No description available</p>
+                                    {% endif %}
+                                    
+                                    <div class="mt-2">
+                                        <a href="{{ url_for('questions_list', tag=tag.name) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            View Questions
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                    <h5>No tags found</h5>
+                    <p class="text-muted">Tags will appear when questions are posted with them.</p>
+                    <a href="{{ url_for('ask_question') }}" class="btn btn-primary">Ask the First Question</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Tag Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-1"></i>Tag Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Tags:</span>
+                        <strong>{{ tags|length }}</strong>
+                    </div>
+                    {% if tags %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Most Popular:</span>
+                            <strong>
+                                <a href="{{ url_for('questions_list', tag=tags[0].name) }}" 
+                                   class="text-decoration-none">{{ tags[0].name }}</a>
+                            </strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Questions:</span>
+                            <strong>{{ tags[0].question_count }}</strong>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- How Tags Work -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-1"></i>How Tags Work
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Tags help categorize questions
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Use specific, relevant tags
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Browse by tag to find related questions
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Popular tags appear first
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.tag-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.tag-card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

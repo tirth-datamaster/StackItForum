@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Questions - StackIt{% endblock %}
+
+{% block breadcrumbs %}
+<div class="bg-light py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Questions</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h4 mb-1">All Questions</h2>
+                    {% if current_tag %}
+                        <p class="text-muted mb-0">
+                            Tagged with: 
+                            <span class="badge bg-primary">{{ current_tag }}</span>
+                            <a href="{{ url_for('questions_list') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </p>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('ask_question') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Ask Question
+                </a>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="card mb-3">
+                <div class="card-body py-2">
+                    <div class="btn-group" role="group" aria-label="Sort options">
+                        <a href="{{ url_for('questions_list', sort='newest', tag=current_tag) }}" 
+                           class="btn btn-sm {{ 'btn-primary' if current_sort == 'newest' else 'btn-outline-secondary' }}">
+                            Newest
+                        </a>
+                        <a href="{{ url_for('questions_list', sort='most-answers', tag=current_tag) }}" 
+                           class="btn btn-sm {{ 'btn-primary' if current_sort == 'most-answers' else 'btn-outline-secondary' }}">
+                            Most Answers
+                        </a>
+                        <a href="{{ url_for('questions_list', sort='most-viewed', tag=current_tag) }}" 
+                           class="btn btn-sm {{ 'btn-primary' if current_sort == 'most-viewed' else 'btn-outline-secondary' }}">
+                            Most Viewed
+                        </a>
+                        <a href="{{ url_for('questions_list', sort='oldest', tag=current_tag) }}" 
+                           class="btn btn-sm {{ 'btn-primary' if current_sort == 'oldest' else 'btn-outline-secondary' }}">
+                            Oldest
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {% if questions.items %}
+                <!-- Questions List -->
+                {% for question in questions.items %}
+                    <div class="card mb-3 question-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <h5 class="card-title">
+                                        <a href="{{ url_for('question_detail', id=question.id) }}" 
+                                           class="text-decoration-none">{{ question.title }}</a>
+                                    </h5>
+                                    <p class="card-text text-muted">
+                                        {{ question.content|truncate(150)|safe }}
+                                    </p>
+                                    
+                                    <!-- Tags -->
+                                    {% if question.tags %}
+                                        <div class="mb-2">
+                                            {% for tag in question.tags %}
+                                                <a href="{{ url_for('questions_list', tag=tag.name) }}" 
+                                                   class="badge bg-secondary text-decoration-none me-1">{{ tag.name }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Question Meta -->
+                                    <div class="small text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        <a href="{{ url_for('user_profile', user_id=question.author.id) }}" 
+                                           class="text-decoration-none">{{ question.author.display_name }}</a>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-clock me-1"></i>{{ relative_time(question.created_at) }}
+                                        {% if question.updated_at != question.created_at %}
+                                            <span class="mx-2">•</span>
+                                            <i class="fas fa-edit me-1"></i>edited {{ relative_time(question.updated_at) }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <div class="question-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-number">{{ question.answer_count }}</span>
+                                            <span class="stat-label">answer{{ 's' if question.answer_count != 1 else '' }}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-number">{{ question.views }}</span>
+                                            <span class="stat-label">view{{ 's' if question.views != 1 else '' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Pagination -->
+                {% if questions.pages > 1 %}
+                    <nav aria-label="Questions pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if questions.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('questions_list', page=questions.prev_num, sort=current_sort, tag=current_tag) }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in questions.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != questions.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('questions_list', page=page_num, sort=current_sort, tag=current_tag) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">…</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if questions.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('questions_list', page=questions.next_num, sort=current_sort, tag=current_tag) }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                    <h5>No questions found</h5>
+                    {% if current_tag %}
+                        <p class="text-muted">No questions found for the tag "{{ current_tag }}".</p>
+                        <a href="{{ url_for('questions_list') }}" class="btn btn-secondary me-2">View All Questions</a>
+                    {% else %}
+                        <p class="text-muted">Be the first to ask a question!</p>
+                    {% endif %}
+                    <a href="{{ url_for('ask_question') }}" class="btn btn-primary">Ask Question</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Popular Tags -->
+            {% if popular_tags %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-tags me-1"></i>Popular Tags
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% for tag in popular_tags %}
+                            <a href="{{ url_for('questions_list', tag=tag.name) }}" 
+                               class="badge bg-light text-dark text-decoration-none me-1 mb-1 tag-badge 
+                                      {{ 'bg-primary text-white' if tag.name == current_tag }}">
+                                {{ tag.name }} ({{ tag.question_count }})
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Help Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-1"></i>How to Ask
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Search to see if your question exists
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Be specific and provide context
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include relevant code or examples
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Add appropriate tags
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

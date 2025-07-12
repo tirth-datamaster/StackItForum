@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to StackIt{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold text-primary mb-4">
+                        Welcome to StackIt
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        The premier Q&A community for developers, designers, and tech enthusiasts. 
+                        Get answers to your coding questions and share your knowledge with the community.
+                    </p>
+                    
+                    <div class="features mb-4">
+                        <div class="feature-item d-flex align-items-center mb-3">
+                            <div class="feature-icon bg-primary text-white rounded-circle me-3">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Ask Questions</h6>
+                                <small class="text-muted">Get help from experienced developers</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item d-flex align-items-center mb-3">
+                            <div class="feature-icon bg-success text-white rounded-circle me-3">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Share Knowledge</h6>
+                                <small class="text-muted">Help others and build your reputation</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item d-flex align-items-center mb-3">
+                            <div class="feature-icon bg-warning text-white rounded-circle me-3">
+                                <i class="fas fa-vote-yea"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Vote & Rank</h6>
+                                <small class="text-muted">Quality content rises to the top</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('replit_auth.login') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 text-center">
+                <div class="hero-illustration">
+                    <svg width="400" height="300" viewBox="0 0 400 300" class="img-fluid">
+                        <!-- Community illustration -->
+                        <circle cx="200" cy="150" r="80" fill="#e3f2fd" opacity="0.5"/>
+                        <circle cx="200" cy="150" r="60" fill="#2196f3" opacity="0.1"/>
+                        
+                        <!-- Question marks -->
+                        <text x="180" y="130" font-family="Arial" font-size="24" fill="#2196f3">?</text>
+                        <text x="220" y="170" font-family="Arial" font-size="18" fill="#4caf50">!</text>
+                        <text x="160" y="180" font-family="Arial" font-size="20" fill="#ff9800">?</text>
+                        
+                        <!-- People icons -->
+                        <circle cx="150" cy="100" r="15" fill="#757575"/>
+                        <rect x="140" y="115" width="20" height="25" rx="10" fill="#757575"/>
+                        
+                        <circle cx="250" cy="120" r="15" fill="#757575"/>
+                        <rect x="240" y="135" width="20" height="25" rx="10" fill="#757575"/>
+                        
+                        <circle cx="200" cy="220" r="15" fill="#757575"/>
+                        <rect x="190" y="235" width="20" height="25" rx="10" fill="#757575"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h4>Growing Community</h4>
+                    <p class="text-muted">Join thousands of developers sharing knowledge</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <i class="fas fa-clock fa-3x text-success mb-3"></i>
+                    <h4>Quick Answers</h4>
+                    <p class="text-muted">Get responses to your questions in minutes</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                    <h4>Quality Content</h4>
+                    <p class="text-muted">Community-moderated, high-quality discussions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

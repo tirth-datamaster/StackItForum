@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Search - StackIt{% endblock %}
+
+{% block breadcrumbs %}
+<div class="bg-light py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Search</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="q" class="form-label">Search Questions</label>
+                                <input type="text" class="form-control" id="q" name="q" 
+                                       value="{{ query }}" placeholder="Enter keywords...">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="tag" class="form-label">Filter by Tag</label>
+                                <input type="text" class="form-control" id="tag" name="tag" 
+                                       value="{{ tag }}" placeholder="Tag name">
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                            {% if query or tag %}
+                                <a href="{{ url_for('search') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            {% if query or tag %}
+                <div class="mb-3">
+                    <h4>Search Results</h4>
+                    {% if query %}
+                        <p class="text-muted">Searching for: <strong>"{{ query }}"</strong></p>
+                    {% endif %}
+                    {% if tag %}
+                        <p class="text-muted">Filtered by tag: <span class="badge bg-primary">{{ tag }}</span></p>
+                    {% endif %}
+                </div>
+
+                {% if questions and questions.items %}
+                    <!-- Results Count -->
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            {{ questions.total }} result{{ 's' if questions.total != 1 else '' }} found
+                        </small>
+                    </div>
+
+                    <!-- Questions List -->
+                    {% for question in questions.items %}
+                        <div class="card mb-3 question-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <h5 class="card-title">
+                                            <a href="{{ url_for('question_detail', id=question.id) }}" 
+                                               class="text-decoration-none">{{ question.title }}</a>
+                                        </h5>
+                                        <p class="card-text text-muted">
+                                            {{ question.content|truncate(150)|safe }}
+                                        </p>
+                                        
+                                        <!-- Tags -->
+                                        {% if question.tags %}
+                                            <div class="mb-2">
+                                                {% for question_tag in question.tags %}
+                                                    <a href="{{ url_for('search', tag=question_tag.name) }}" 
+                                                       class="badge bg-secondary text-decoration-none me-1">{{ question_tag.name }}</a>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <!-- Question Meta -->
+                                        <div class="small text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            <a href="{{ url_for('user_profile', user_id=question.author.id) }}" 
+                                               class="text-decoration-none">{{ question.author.display_name }}</a>
+                                            <span class="mx-2">•</span>
+                                            <i class="fas fa-clock me-1"></i>{{ relative_time(question.created_at) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <div class="question-stats">
+                                            <div class="stat-item">
+                                                <span class="stat-number">{{ question.answer_count }}</span>
+                                                <span class="stat-label">answer{{ 's' if question.answer_count != 1 else '' }}</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span class="stat-number">{{ question.views }}</span>
+                                                <span class="stat-label">view{{ 's' if question.views != 1 else '' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Pagination -->
+                    {% if questions.pages > 1 %}
+                        <nav aria-label="Search results pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if questions.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('search', page=questions.prev_num, q=query, tag=tag) }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in questions.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != questions.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('search', page=page_num, q=query, tag=tag) }}">{{ page_num }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">…</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if questions.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('search', page=questions.next_num, q=query, tag=tag) }}">Next</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5>No results found</h5>
+                        <p class="text-muted">Try different keywords or browse popular tags below.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5>Search Questions</h5>
+                    <p class="text-muted">Enter keywords or tags to find relevant questions.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Popular Tags -->
+            {% if popular_tags %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-tags me-1"></i>Popular Tags
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% for popular_tag in popular_tags %}
+                            <a href="{{ url_for('search', tag=popular_tag.name) }}" 
+                               class="badge bg-light text-dark text-decoration-none me-1 mb-1 tag-badge 
+                                      {{ 'bg-primary text-white' if popular_tag.name == tag }}">
+                                {{ popular_tag.name }} ({{ popular_tag.question_count }})
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Search Tips -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-1"></i>Search Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Use specific keywords
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Filter by relevant tags
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Try different word combinations
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Browse popular tags for ideas
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Ask a Question - StackIt{% endblock %}
+
+{% block breadcrumbs %}
+<div class="bg-light py-2">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('questions_list') }}">Questions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Ask Question</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Ask a Question
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Title -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            <small class="text-muted d-block mb-2">
+                                Be specific and imagine you're asking a question to another person
+                            </small>
+                            {{ form.title(class="form-control") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.title.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-3">
+                            {{ form.content.label(class="form-label fw-bold") }}
+                            <small class="text-muted d-block mb-2">
+                                Include all the information someone would need to answer your question
+                            </small>
+                            {{ form.content(class="form-control tinymce-editor", rows="10") }}
+                            {% if form.content.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.content.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="mb-4">
+                            {{ form.tags.label(class="form-label fw-bold") }}
+                            <small class="text-muted d-block mb-2">
+                                Add up to 5 tags to describe what your question is about (separated by commas)
+                            </small>
+                            {{ form.tags(class="form-control") }}
+                            {% if form.tags.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.tags.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Examples: python, javascript, html, css, react
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Post Your Question
+                            </button>
+                            <a href="{{ url_for('questions_list') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Tips Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-1"></i>Writing a Good Question
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Summarize your problem in a one-line title
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Describe your problem in more detail
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include code that reproduces the issue
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Add relevant tags to help others find your question
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Search Before Asking -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-search me-1"></i>Search Before Asking
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">
+                        Check if your question has already been answered:
+                    </p>
+                    <form method="GET" action="{{ url_for('search') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="q" placeholder="Search existing questions...">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize TinyMCE
+    tinymce.init({
+        selector: '.tinymce-editor',
+        height: 400,
+        menubar: false,
+        plugins: 'lists link code codesample',
+        toolbar: 'bold italic | bullist numlist | link code codesample | removeformat',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }',
+        codesample_languages: [
+            {text: 'Python', value: 'python'},
+            {text: 'JavaScript', value: 'javascript'},
+            {text: 'HTML/XML', value: 'markup'},
+            {text: 'CSS', value: 'css'},
+            {text: 'Java', value: 'java'},
+            {text: 'C++', value: 'cpp'},
+            {text: 'SQL', value: 'sql'}
+        ]
+    });
+</script>
+{% endblock %}
